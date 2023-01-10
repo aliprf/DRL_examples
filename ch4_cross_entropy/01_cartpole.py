@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import gym
 from collections import namedtuple
 import numpy as np
@@ -6,7 +8,9 @@ from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+from pyvirtualdisplay import Display
+# from gym.wrappers.monitoring.video_recorder import VideoRecorder
+before_training = "before_training.mp4"
 
 HIDDEN_SIZE = 128
 BATCH_SIZE = 16
@@ -34,12 +38,12 @@ def iterate_batches(env, net, batch_size):
     batch = []
     episode_reward = 0.0
     episode_steps = []
-    obs = [env.reset()[0]]
-    sm = nn.Softmax(dim=1)
+    obs = env.reset()[0]
+    sm = nn.Softmax(dim=0)
     while True:
         obs_v = torch.FloatTensor(obs)
         act_probs_v = sm(net(obs_v))
-        act_probs = act_probs_v.data.numpy()[0]
+        act_probs = act_probs_v.data.numpy()
         action = np.random.choice(len(act_probs), p=act_probs)
         next_obs, reward, is_done, _,_ = env.step(action)
         episode_reward += reward
@@ -52,7 +56,7 @@ def iterate_batches(env, net, batch_size):
             if len(batch) == batch_size:
                 yield batch
                 batch = []
-        obs = [next_obs]
+        obs = next_obs
 
 
 def filter_batch(batch, percentile):
@@ -74,8 +78,9 @@ def filter_batch(batch, percentile):
 
 
 if __name__ == "__main__":
-    env = gym.make("CartPole-v0")
-    # env = gym.wrappers.Monitor(env, directory="mon", force=True)
+    # env = gym.make("CartPole-v0", render_mode="human")
+    env = gym.make("CartPole-v0", render_mode="human")
+    # env = gym.wrappers.RecordVideo(env, 'video')
     obs_size = env.observation_space.shape[0]
     n_actions = env.action_space.n
 
@@ -99,4 +104,6 @@ if __name__ == "__main__":
         if reward_m > 199:
             print("Solved!")
             break
+
     writer.close()
+    env.close()

@@ -2,3 +2,7 @@ torch
 tensorboardX
 numpy
 gym
+pyvirtualdisplay==0.2.*
+ffmpeg
+ imageio-ffmpeg
+ pygame
