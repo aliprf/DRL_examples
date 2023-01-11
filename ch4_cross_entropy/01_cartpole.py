@@ -79,7 +79,7 @@ def filter_batch(batch, percentile):
 
 if __name__ == "__main__":
     # env = gym.make("CartPole-v0", render_mode="human")
-    env = gym.make("CartPole-v0", render_mode="human")
+    env = gym.make("CartPole-v0")
     # env = gym.wrappers.RecordVideo(env, 'video')
     obs_size = env.observation_space.shape[0]
     n_actions = env.action_space.n
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         writer.add_scalar("loss", loss_v.item(), iter_no)
         writer.add_scalar("reward_bound", reward_b, iter_no)
         writer.add_scalar("reward_mean", reward_m, iter_no)
-        if reward_m > 199:
+        if reward_m > 500:
             print("Solved!")
             break
 
